@@ -29,6 +29,7 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.10.2'
     compile 'net.sourceforge.jtds:jtds:1.2.7'
     compile 'com.timgroup:java-statsd-client:2.0.0'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
 }
 
 jar {
