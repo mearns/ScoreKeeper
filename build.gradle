@@ -1,9 +1,6 @@
 buildscript {
     repositories {
-        maven {
-            name "artifactory01"
-            url "http://artifactory01.nexus.commercehub.com/artifactory/libs-release"
-        }
+        jcenter()
     }
 
     dependencies {
@@ -18,15 +15,12 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'shadow'
 
-repositories {
-    maven {
-        name "artifactory01"
-        url "http://artifactory01.nexus.commercehub.com/artifactory/libs-release"
-    }
-}
-
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.0'
