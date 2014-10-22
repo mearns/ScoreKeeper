@@ -12,23 +12,19 @@ import java.util.Collection;
 public class Site24x7ActorFactory {
 
     private final StatsDClient client;
-    private final String url;
     private final ActorContext context;
 
-    public Site24x7ActorFactory(StatsDClient client, String url, ActorContext context) {
+    public Site24x7ActorFactory(StatsDClient client, ActorContext context) {
         this.client = client;
-        this.url = url;
         this.context = context;
     }
 
-    public void makeMetricsForDatasource(Collection<Metric> collMet) throws SQLException {
-        for (Metric m: collMet){
-            makeScalarActor(m);
-        }
+    public void makeMetricsForDatasource(Metric m) throws SQLException {
+        makeScalarActor(m);
     }
 
     private void makeScalarActor(Metric m) throws SQLException {
-        Props props = Props.create(Site24x7PollingActor.class, url, client, m);
+        Props props = Props.create(Site24x7PollingActor.class, m.getUrl(), client, m);
         newActorFromProps(m.getActorName(), props);
     }
 

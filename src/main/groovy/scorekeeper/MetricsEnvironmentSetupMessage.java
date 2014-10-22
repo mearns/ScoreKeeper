@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import scorekeeper.metrics.DatasourceMetrics;
-import scorekeeper.metrics.HornetQMetrics;
 import scorekeeper.metrics.JMXMetrics;
 import scorekeeper.metrics.Site24x7Metrics;
 
@@ -15,14 +14,12 @@ public class MetricsEnvironmentSetupMessage {
 	private String appName;
 	private Collection<DatasourceMetrics> dsMetricPoints;
 	private Collection<JMXMetrics> jmxMetricPoints;
-	private Collection<HornetQMetrics> jmsMetricPoints;
-    private Collection<Site24x7Metrics> site24x7MetricPoints;
+    private Collection<Metric> site24x7MetricPoints;
 	
 	public MetricsEnvironmentSetupMessage(){
-		dsMetricPoints = new ArrayList<DatasourceMetrics>();
-		jmxMetricPoints = new ArrayList<JMXMetrics>();
-		jmsMetricPoints = new ArrayList<HornetQMetrics>();
-        site24x7MetricPoints = new ArrayList<Site24x7Metrics>();
+		dsMetricPoints = new ArrayList<>();
+		jmxMetricPoints = new ArrayList<>();
+        site24x7MetricPoints = new ArrayList<>();
 	}
 	
 	public String getEnvName() {
@@ -69,24 +66,12 @@ public class MetricsEnvironmentSetupMessage {
 	public Collection<JMXMetrics> getJMXMetrics() {
 		return jmxMetricPoints;
 	}
-	
-	public void addHornetQMetrics(HornetQMetrics... newMetrics) {
-        for (HornetQMetrics jmsm: newMetrics){
-            jmsMetricPoints.add(jmsm);
-        }
+
+    public void addSite24x7Metrics(Collection newMetrics) {
+        site24x7MetricPoints.addAll(newMetrics);
     }
 
-    public Collection<HornetQMetrics> getHornetQMetrics() {
-        return jmsMetricPoints;
-    }
-
-    public void addSite24x7Metrics(Site24x7Metrics... newMetrics) {
-        for (Site24x7Metrics jmsm: newMetrics){
-            site24x7MetricPoints.add(jmsm);
-        }
-    }
-
-    public Collection<Site24x7Metrics> getSite24x7Metrics() {
+    public Collection<Metric> getSite24x7Metrics() {
         return site24x7MetricPoints;
     }
 }

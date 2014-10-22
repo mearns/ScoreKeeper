@@ -14,7 +14,7 @@ public class Site24x7PollingActor extends CircuitBrokenScheduledActor {
 
     public Site24x7PollingActor(String url, StatsDClient sdc, Metric metric) {
         super(metric);
-        this.site24x7Client = new Site24x7Client(url, metric.getQueryString());
+        this.site24x7Client = new Site24x7Client(url);
         this.statsClient = sdc;
         this.metric = metric;
     }

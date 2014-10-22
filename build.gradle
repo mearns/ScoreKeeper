@@ -29,6 +29,10 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.10.2'
     compile 'net.sourceforge.jtds:jtds:1.2.7'
     compile 'com.timgroup:java-statsd-client:2.0.0'
+    compile 'org.postgresql:postgresql:9.3-1102-jdbc41'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
 }
 
 jar {
@@ -67,7 +71,7 @@ shadow {
 
 artifacts {
     archives(file("${buildDir}/distributions/scorekeeper-${version}-shadow.jar")) {
-        name "curator"
+        name "scorekeeper"
         classifier "shadow"
         builtBy shadowJar
     }

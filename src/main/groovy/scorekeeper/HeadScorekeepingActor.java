@@ -70,9 +70,9 @@ public class HeadScorekeepingActor extends UntypedActor {
                     .makeMetricsForDatasource(jmxms.getMetrics());
         }
 
-        for (Site24x7Metrics site24x7Metrics : smsg.getSite24x7Metrics()) {
-            new Site24x7ActorFactory(hub, site24x7Metrics.getUrl(), getContext())
-                    .makeMetricsForDatasource(site24x7Metrics.getMetrics());
+        for (Metric site24x7Metrics : smsg.getSite24x7Metrics()) {
+            new Site24x7ActorFactory(hub, getContext())
+                    .makeMetricsForDatasource(site24x7Metrics);
         }
     }
 

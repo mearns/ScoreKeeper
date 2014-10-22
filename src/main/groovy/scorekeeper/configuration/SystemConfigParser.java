@@ -32,8 +32,6 @@ public class SystemConfigParser {
             initializeDatasources(systemCfg, sm);
             initializeJMX(systemCfg, sm);
 
-            initializeSite24x7(systemCfg, sm);
-
         } catch (ConfigException.Missing missingConfig) {
             if (!systemConf.exists()) {
                 System.out.println("No file " + PATH_TO_SYSPROPS + " could be found. A sample will be generated for you at " + PATH_TO_SYSPROPS + ".");
@@ -68,17 +66,6 @@ public class SystemConfigParser {
             jmxm.setPort(jmx.getInt("port"));
 
             sm.addJMXMetrics(jmxm);
-        }
-    }
-
-    protected static void initializeSite24x7(Config test, MetricsEnvironmentSetupMessage sm) {
-        List<? extends Config> twenty4Sevens = test.getConfigList("site24x7");
-        for (Config two47 : twenty4Sevens) {
-            Site24x7Metrics site24x7Metrics = new Site24x7Metrics(two47.getString("name"));
-
-            site24x7Metrics.setUrl(two47.getString("url"));
-
-            sm.addSite24x7Metrics(site24x7Metrics);
         }
     }
 }

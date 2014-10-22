@@ -7,17 +7,14 @@ import static groovyx.net.http.ContentType.XML
 import static groovyx.net.http.Method.GET
 
 class Site24x7Client {
-
     private final String url
-    private final String queryString
 
-    Site24x7Client(String url, String queryString) {
+    Site24x7Client(String url) {
         this.url = url
-        this.queryString = queryString
     }
 
     List<Site24x7Monitor> getMonitors() {
-        def http = new HTTPBuilder(url + "?" + queryString)
+        def http = new HTTPBuilder(url)
         List<Site24x7Monitor> monitors = new ArrayList<>()
 
         http.request(GET, XML) {

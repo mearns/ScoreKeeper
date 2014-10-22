@@ -10,7 +10,7 @@ public class Metric {
     private MetricTypes metricTypes = MetricTypes.db;
     private String objectName;
     private String attribute;
-    private String queryString;
+    private String url;
 
     public Metric(List<String> list) {
         this.metricName = list;
@@ -72,11 +72,11 @@ public class Metric {
         this.attribute = attribute;
     }
 
-    public String getQueryString() {
-        return queryString;
+    public String getUrl() {
+        return url;
     }
 
-    public void setQueryString(String queryString) {
-        this.queryString = queryString;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
