@@ -1,32 +1,35 @@
 package scorekeeper;
 
-import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.JMException;
 
-import scala.Function0;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
 import akka.actor.UntypedActor;
 import akka.pattern.CircuitBreaker;
 import akka.pattern.CircuitBreakerOpenException;
 
 public abstract class CircuitBrokenScheduledActor extends UntypedActor {
+    private static final int MAX_TIME_TO_WAIT_FOR_QUERY_REPEAT_S = 120;
+    private static final int TIME_BETWEEN_RETRIES_S = 30;
 	private CircuitBreaker breaker;
 	private FiniteDuration duration;
 	
 	protected CircuitBrokenScheduledActor(Metric metric){
 		this.duration = Duration.create(metric.getFrequencyMs(), TimeUnit.MILLISECONDS);
-		this.breaker = new CircuitBreaker(getContext().dispatcher(), getContext().system().scheduler(),
-				1, Duration.create(20, "s"), Duration.create(30, "s"))
-			.onOpen(makeOpenHandler())
-			.onClose(makeCloseHandler());
+		this.breaker = makeNewCB(duration.toMillis()*2);
 	}
-	
-	protected Runnable makeOpenHandler() {
+
+    private CircuitBreaker makeNewCB(long millis) {
+        return new CircuitBreaker(getContext().dispatcher(), getContext().system().scheduler(),
+                1, Duration.create(millis, "ms"), Duration.create(TIME_BETWEEN_RETRIES_S, "s"))
+            .onOpen(makeOpenHandler())
+            .onClose(makeCloseHandler());
+    }
+
+    protected Runnable makeOpenHandler() {
 		return new OpenHandler();
 	}
 
@@ -41,9 +44,14 @@ public abstract class CircuitBrokenScheduledActor extends UntypedActor {
 	}
 
 
-	private class OpenHandler implements Runnable {
+	protected class OpenHandler implements Runnable {
 		public void run(){
-			System.out.println("Circuit broken (open) for " + getContext().self().path().name());
+            long currentDur = duration.toMillis();
+            long newDur = Math.min(currentDur * 2, MAX_TIME_TO_WAIT_FOR_QUERY_REPEAT_S * 1000);
+			System.out.println("Circuit broken (open) for " + getContext().self().path().name() + "; delaying to " + currentDur);
+
+            duration = Duration.create(newDur, TimeUnit.MILLISECONDS);
+            breaker = makeNewCB(newDur);
 		}
 	}
 

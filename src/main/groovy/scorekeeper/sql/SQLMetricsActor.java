@@ -70,10 +70,10 @@ public abstract class SQLMetricsActor extends CircuitBrokenScheduledActor {
 		return new OpenSQLHandler();
 	}
 
-	private class OpenSQLHandler implements Runnable{
+	private class OpenSQLHandler extends OpenHandler{
 		@Override
 		public void run() {
-			System.out.println("Circuit broken (open) for " + getContext().self().path().name());
+			super.run();
 			statement = null;
 		}
 	}
