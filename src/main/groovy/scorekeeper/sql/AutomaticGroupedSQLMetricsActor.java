@@ -28,13 +28,13 @@ public class AutomaticGroupedSQLMetricsActor extends SQLMetricsActor {
 		
 		int i = 1;
 		for (String metricName: metric.getMetricNames()){
-			int scalar = rs.getInt(++i);
+			double scalar = rs.getDouble(++i);
 			writeCounter(grouping, scalar, metricName);
 		}
 	}
 
 
-	protected void writeCounter(String grouping, int counter, String metricName) {
+	protected void writeCounter(String grouping, double counter, String metricName) {
 		statsClient.gauge(metricName + "." + grouping, counter);
 		System.out.print("g");
 		//System.out.println(metricName + "." + grouping + ":" + counter);
