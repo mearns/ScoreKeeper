@@ -7,12 +7,11 @@ import scorekeeper.MetricTypes
 import scorekeeper.MetricsEnvironmentSetupMessage
 import scorekeeper.metrics.DatasourceMetrics
 import scorekeeper.metrics.JMXMetrics
-import scorekeeper.metrics.Site24x7Metrics
 
 public class MonitoringParser {
     public void initializeMetrics(MetricsEnvironmentSetupMessage sm, Collection<Config> collections) {
         for (Config collection : collections) {
-            String dsName = collection.getString("ds")
+            String dsName = collection.hasPath("ds") ?: null
             for (Config cl : collection.getConfigList("monitors")) {
                 if (isDbMetric(cl)) {
                     addDbMetric(dsName, cl, sm)
@@ -90,10 +89,10 @@ public class MonitoringParser {
         return cl.hasPath("type") && MetricTypes.site24x7.name().equals(cl.getString("type"))
     }
 
-    private static void addSite24x7Metric(MetricsEnvironmentSetupMessage sm, Config cl) {
+    private static void addSite24x7Metric(Config cl, MetricsEnvironmentSetupMessage sm) {
         Metric m = new Metric(getMetricName(cl))
         setFrequency(cl, m)
-        m.url(cl.getString("url"))
+        m.setUrl(cl.getString("url"))
 
         sm.addSite24x7Metrics(m)
     }

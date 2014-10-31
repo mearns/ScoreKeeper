@@ -1,11 +1,12 @@
 # ScoreKeeper
 ## *A polling agent for non-invasively extracting metrics and shipping them off to Statsd/Graphite*
 
-We love Graphite. But we survived for many years without a purpose-driven metrics repository, wielding instead
-an amalgam of monitoring tools, services and SQL Scripts for determining the health of our systems.
+We love Graphite. But we survived for many years without a purpose-driven metrics repository, instead
+relying on a variety of task specific, high cost monitoring tools, services and SQL Scripts for determining the health 
+of our systems.
 
 ScoreKeeper's job is to go out and collect these metrics and put them into Graphite, where they can be 
-shared and correlated with real-time metrics.
+shared and correlated with other real-time metrics.
 
 The design philosophy is three-fold:
 - Allow metrics to be configured quickly
@@ -21,7 +22,7 @@ Once you've configured your datasources and connections, SK's workflow is simple
 - Be kind to engineers adding new metrics (so they will want to use SK)
   - We will try to make sane conventions and keep boilerplate short. 
   - We use HOCON, a configuration language that allows for greater human readability than JSON or XML. 
-  - The triple-quote syntax allows big blocks of SQL to be copypasted into or out of
+  - The triple-quote syntax allows big blocks of SQL to be copypasted into or out of a config
 - Be kind to production systems (so nobody will demand you NOT use SK)
   - We work to have minimum impact on the sources of our metrics: avoiding locks, detuning over-aggressive schedules,
 making efficient use of connections and network.

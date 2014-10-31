@@ -67,8 +67,10 @@ public class MetricsEnvironmentSetupMessage {
 		return jmxMetricPoints;
 	}
 
-    public void addSite24x7Metrics(Collection newMetrics) {
-        site24x7MetricPoints.addAll(newMetrics);
+    public void addSite24x7Metrics(Metric ... newMetrics) {
+        for (Metric m: newMetrics) {
+            site24x7MetricPoints.add(m);
+        }
     }
 
     public Collection<Metric> getSite24x7Metrics() {
