@@ -10,10 +10,11 @@ buildscript {
 
 
 apply plugin: 'java'
+apply plugin: 'shadow'
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'shadow'
+
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
