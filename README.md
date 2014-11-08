@@ -53,5 +53,18 @@ You describe the systems you're reading from and the systems you're writing to h
 ### {monitoring subject}.conf
 You describe the metrics you're collecting and the schedule here.
 
+## Building
+Use the gradle wrapper.
+
+```bash
+./gradlew assemble
+```
+
+```dos
+gradlew.bat assemble
+```
+
+
+
 ## Installing SK
 Unzip.
