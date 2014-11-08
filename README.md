@@ -1,4 +1,4 @@
-# ScoreKeeper
+# ScoreKeeper [![Build Status](https://travis-ci.org/commercehub-oss/ScoreKeeper.svg?branch=master)](https://travis-ci.org/commercehub-oss/ScoreKeeper)
 ## *A polling agent for non-invasively extracting metrics and shipping them off to Statsd/Graphite*
 
 We love Graphite. But we survived for many years without a purpose-driven metrics repository, wielding instead
