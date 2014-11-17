@@ -6,16 +6,25 @@ import akka.actor.Props
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import scorekeeper.configuration.MonitoringParser
 import scorekeeper.configuration.SystemConfigParser
+import scorekeeper.util.SampleConfigurationWriter
 
 public class ScoreKeeper {
+	private static Logger log = LoggerFactory.getLogger(ScoreKeeper.class)
 	private ActorSystem system
 	private ActorRef headRef
 	private static MonitoringParser mp = new MonitoringParser()
 	private static SystemConfigParser scp = new SystemConfigParser()
 
-	public static void main(String[] args) throws InterruptedException {	
+	public static void main(String[] args) throws InterruptedException {
+		File workingDir = new File(System.getProperty("user.dir"))
+
+		assureDirs(workingDir)
+
+
 		MetricsEnvironmentSetupMessage sm = scp.newStartupMessage()
 		mp.initializeMetrics(sm, getMonitoringConfig(args))
 		
@@ -25,7 +34,29 @@ public class ScoreKeeper {
 			Thread.sleep(100)
 		}
 	}
-	
+
+	/*
+	/config
+	/config/system-props.conf
+	/logs
+	/lib/*`
+
+	 */
+	static def assureDirs(File root) {
+		File config = new File(root, "config")
+		File configFile = new File(config, "system-props.conf")
+		File logs = new File(root, "logs")
+		File libs = new File(root, "libs")
+
+		if (!config.exists()) config.mkdir()
+		if (!logs.exists()) logs.mkdir()
+		if (!libs.exists()) libs.mkdir()
+		if (!configFile.exists()){
+			log.info("No system-props.conf found. Making new system config from template.")
+			SampleConfigurationWriter.writeSampleConfigAndDie();
+		}
+	}
+
 	private static Collection<Config> getMonitoringConfig(String[] args) {
 		ArrayList<Config> al = new ArrayList<Config>()
 		for (String arg: args){
@@ -46,7 +77,7 @@ public class ScoreKeeper {
         headRef.tell(sm, ActorRef.noSender())
 	}
 
-	protected Config fetchActorSystemConfig() {
+	static Config fetchActorSystemConfig() {
 		Config c = ConfigFactory.parseString("""
 sql-actor-dispatch {
     type = Dispatcher

@@ -1,44 +1,32 @@
 package scorekeeper.configuration;
 
-import java.io.File;
-import java.util.List;
-
-import com.typesafe.config.ConfigException;
-import net.sourceforge.jtds.jdbcx.JtdsDataSource;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import net.sourceforge.jtds.jdbcx.JtdsDataSource;
 import scorekeeper.MetricsEnvironmentSetupMessage;
 import scorekeeper.metrics.DatasourceMetrics;
 import scorekeeper.metrics.JMXMetrics;
-import scorekeeper.metrics.Site24x7Metrics;
-import scorekeeper.util.SampleConfigurationWriter;
+
+import java.io.File;
+import java.util.List;
 
 public class SystemConfigParser {
     private static final String PATH_TO_SYSPROPS = "config/system-props.conf";
 
     public MetricsEnvironmentSetupMessage newStartupMessage() {
-        MetricsEnvironmentSetupMessage sm = null;
         File systemConf = new File(PATH_TO_SYSPROPS);
-        try {
-            Config systemCfg = ConfigFactory.parseFile(systemConf);
 
-            sm = new MetricsEnvironmentSetupMessage();
-            sm.setAppName(systemCfg.getString("app"));
-            sm.setEnvName(systemCfg.getString("env"));
-            sm.setHostName(systemCfg.getString("stats-server.host"));
-            sm.setPort(systemCfg.getInt("stats-server.port"));
+        Config systemCfg = ConfigFactory.parseFile(systemConf);
 
-            initializeDatasources(systemCfg, sm);
-            initializeJMX(systemCfg, sm);
+        MetricsEnvironmentSetupMessage sm = new MetricsEnvironmentSetupMessage();
+        sm.setAppName(systemCfg.getString("app"));
+        sm.setEnvName(systemCfg.getString("env"));
+        sm.setHostName(systemCfg.getString("stats-server.host"));
+        sm.setPort(systemCfg.getInt("stats-server.port"));
 
-        } catch (ConfigException.Missing missingConfig) {
-            if (!systemConf.exists()) {
-                System.out.println("No file " + PATH_TO_SYSPROPS + " could be found. A sample will be generated for you at " + PATH_TO_SYSPROPS + ".");
-                SampleConfigurationWriter.writeSampleConfigAndDie();
-            }
-            throw missingConfig;
-        }
+        initializeDatasources(systemCfg, sm);
+        initializeJMX(systemCfg, sm);
+
         return sm;
     }
 

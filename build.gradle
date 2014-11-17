@@ -4,20 +4,22 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:0.8"
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+        classpath 'org.codehaus.groovy:groovy-all:2.3.0'
     }
 }
 
-
+apply plugin: 'eu.appsatori.fatjar'
 apply plugin: 'java'
-apply plugin: 'shadow'
 apply plugin: 'groovy'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'application'
 
+version="1.0.0"
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+mainClassName="scorekeeper.ScoreKeeper"
 
 repositories {
     mavenCentral()
@@ -34,49 +36,20 @@ dependencies {
     compile 'org.postgresql:postgresql:9.3-1102-jdbc41'
     compile 'ch.qos.logback:logback-classic:1.1.2'
 
-    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'    
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+
+//    classpath 'lib/*'
 }
 
-jar {
+fatJar {
     manifest {
-        attributes "Main-Class": "scorekeeper.ScoreKeeper"
+        attributes 'Main-Class': mainClassName
         attributes "Built-Date": new Date() //now
         attributes "Built-By": System.getProperty("user.name")
         attributes "Build-Jdk": System.getProperty("java.version")
         attributes "Implementation-Title": project.name
         attributes "Implementation-Version": project.version
         attributes "Implementation-Vendor-Id": project.group
-        [
-                "BUILD_NUMBER": "Build-Number",
-                "BUILD_ID"    : "Build-Id",
-                "HG_COMMIT"   : "HG-Commit",
-                "HG_BRANCH"   : "HG-Branch"
-        ].each { envVar, attrName ->
-            def envVal = System.getenv(envVar)
-            if (envVal) {
-                attributes([(attrName): envVal])
-            }
-        }
     }
+    exclude 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.SF'
 }
-
-assemble.dependsOn "shadowJar" // Include shadowed jar as part of standard project outputs
-shadow {
-    outputFile = file("${buildDir}/distributions/scorekeeper-${version}-shadow.jar")
-    exclude "META-INF/*.DSA"
-    exclude "META-INF/*.RSA"
-
-    transformer(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
-        resource = "reference.conf"
-    }
-}
-
-artifacts {
-    archives(file("${buildDir}/distributions/scorekeeper-${version}-shadow.jar")) {
-        name "scorekeeper"
-        classifier "shadow"
-        builtBy shadowJar
-    }
-}
-
-

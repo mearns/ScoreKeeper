@@ -7,7 +7,7 @@ public class SampleConfigurationWriter {
     public static void writeSampleConfigAndDie() {
         try {
             InputStream source = SampleConfigurationWriter.class.getResourceAsStream("sample.system-props.conf");
-            copyFileUsingFileStreams(source, new File("config/sample.system-props.conf"));
+            copyFileUsingFileStreams(source, new File("config/system-props.conf"));
         } catch (Exception e) {
             e.printStackTrace();
         }
