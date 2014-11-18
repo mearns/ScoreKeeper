@@ -13,7 +13,6 @@ apply plugin: 'shadow'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
-mainClassName = "scorekeeper.ScoreKeeper"
 
 repositories {
     mavenCentral()
@@ -37,7 +36,7 @@ dependencies {
 jar {
     manifest {
         attributes "Class-Path": "lib/* config/*"
-        attributes "Main-Class": mainClassName
+        attributes "Main-Class": "scorekeeper.ScoreKeeper"
         attributes "Built-Date": new Date() //now
         attributes "Built-By": System.getProperty("user.name")
         attributes "Build-Jdk": System.getProperty("java.version")
