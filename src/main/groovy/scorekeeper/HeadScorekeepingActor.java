@@ -12,7 +12,6 @@ import scala.concurrent.duration.Duration;
 import scorekeeper.jmx.JMXActorFactory;
 import scorekeeper.metrics.DatasourceMetrics;
 import scorekeeper.metrics.JMXMetrics;
-import scorekeeper.metrics.Site24x7Metrics;
 import scorekeeper.site24x7.Site24x7ActorFactory;
 import scorekeeper.sql.SQLActorFactory;
 
@@ -58,7 +57,7 @@ public class HeadScorekeepingActor extends UntypedActor {
     protected void makeKids(MetricsEnvironmentSetupMessage smsg) throws SQLException {
         this.startupMessage = smsg;
 
-        StatsDClient hub = new NonBlockingStatsDClient(smsg.getAppName() + "." + smsg.getEnvName(), smsg.getHostName(), smsg.getPort());
+        StatsDClient hub = new NonBlockingStatsDClient(smsg.getAppName() + "." + smsg.getEnvName(), smsg.getHostName(), smsg.getStatsDPort());
 
         for (DatasourceMetrics dsm : smsg.getDatasourceMetrics()) {
             new SQLActorFactory(hub, dsm.getDataSource(), getContext())

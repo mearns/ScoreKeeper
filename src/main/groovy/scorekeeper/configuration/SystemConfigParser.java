@@ -22,7 +22,16 @@ public class SystemConfigParser {
         sm.setAppName(systemCfg.getString("app"));
         sm.setEnvName(systemCfg.getString("env"));
         sm.setHostName(systemCfg.getString("stats-server.host"));
-        sm.setPort(systemCfg.getInt("stats-server.port"));
+
+        if (systemCfg.hasPath("stats-server.port")) {
+            sm.setStatsDPort(systemCfg.getInt("stats-server.port"));
+        }
+        if (systemCfg.hasPath("stats-server.statsdPort")){
+            sm.setStatsDPort(systemCfg.getInt("stats-server.statsdPort"));
+        }
+        if (systemCfg.hasPath("stats-server.graphitePort")){
+            sm.setGraphiteTCPPort(systemCfg.getInt("stats-server.graphitePort"));
+        }
 
         initializeDatasources(systemCfg, sm);
         initializeJMX(systemCfg, sm);
@@ -31,6 +40,10 @@ public class SystemConfigParser {
     }
 
     protected static void initializeDatasources(Config test, MetricsEnvironmentSetupMessage sm) {
+        if (!test.hasPath("dbs")) {
+            return;
+        }
+
         List<? extends Config> dbs = test.getConfigList("dbs");
         for (Config db : dbs) {
             JtdsDataSource dataSource = new JtdsDataSource();
@@ -46,6 +59,10 @@ public class SystemConfigParser {
     }
 
     protected static void initializeJMX(Config test, MetricsEnvironmentSetupMessage sm) {
+        if (!test.hasPath("jmx")) {
+            return;
+        }
+
         List<? extends Config> jmxs = test.getConfigList("jmx");
         for (Config jmx : jmxs) {
             JMXMetrics jmxm = new JMXMetrics(jmx.getString("name"));

@@ -71,8 +71,7 @@ public class JMXPollingActor extends CircuitBrokenScheduledActor {
 	
 	protected void writeCounter(int counter, String metricName) {
 		statsClient.gauge(metricName, counter);
-		
-//		System.out.println(metricName + ":" + counter);
+
 		System.out.print("x");
 	}
 

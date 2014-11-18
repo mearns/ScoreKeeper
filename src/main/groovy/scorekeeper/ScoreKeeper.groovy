@@ -24,47 +24,50 @@ public class ScoreKeeper {
 
 		assureDirs(workingDir)
 
-
 		MetricsEnvironmentSetupMessage sm = scp.newStartupMessage()
 		mp.initializeMetrics(sm, getMonitoringConfig(args))
-		
+
 		ScoreKeeper sk = new ScoreKeeper(sm)
 		sk.keepScore()
+		log.info("Keeping score! CTRL-C to stop.")
 		while (true){
 			Thread.sleep(100)
 		}
 	}
 
-	/*
-	/config
-	/config/system-props.conf
-	/logs
-	/lib/*`
-
-	 */
 	static def assureDirs(File root) {
 		File config = new File(root, "config")
 		File configFile = new File(config, "system-props.conf")
+		File logbackConfigFile = new File(config, "logback.xml")
 		File logs = new File(root, "logs")
-		File libs = new File(root, "libs")
+		File monitoringConfigs = new File(root, "monitoring-conf")
 
 		if (!config.exists()) config.mkdir()
 		if (!logs.exists()) logs.mkdir()
-		if (!libs.exists()) libs.mkdir()
+		if (!monitoringConfigs.exists()){
+			monitoringConfigs.mkdir()
+			SampleConfigurationWriter.writeSampleConfig("jmx-monitoring.conf", 		new File(monitoringConfigs, "jmx-monitoring.conf"))
+			SampleConfigurationWriter.writeSampleConfig("site24x7-monitoring.conf", new File(monitoringConfigs, "site24x7-monitoring.conf"))
+			SampleConfigurationWriter.writeSampleConfig("sql-monitoring.conf", 		new File(monitoringConfigs, "sql-monitoring.conf"))
+		}
 		if (!configFile.exists()){
-			log.info("No system-props.conf found. Making new system config from template.")
-			SampleConfigurationWriter.writeSampleConfigAndDie();
+			SampleConfigurationWriter.writeSampleConfig("sample.system-props.conf", configFile);
+			log.info("No system-props.conf found. Making new system config from template. You will need to fill it in before ScoreKeeper can run.")
+			System.exit(1)
 		}
 	}
 
 	private static Collection<Config> getMonitoringConfig(String[] args) {
+		if (args.length == 0){
+
+		}
 		ArrayList<Config> al = new ArrayList<Config>()
 		for (String arg: args){
 			File f = new File(arg)
 			if (f.exists() && f.isFile()){
 				al.add(ConfigFactory.parseFile(f))
 			} else {
-				System.out.println(f.getName() + " specified but not present")
+				log.warn(f.getName() + " specified but not present")
 			}
 		}
 		return al
@@ -79,6 +82,12 @@ public class ScoreKeeper {
 
 	static Config fetchActorSystemConfig() {
 		Config c = ConfigFactory.parseString("""
+akka {
+  loggers = ["akka.event.slf4j.Slf4jLogger"]
+  loglevel = "DEBUG"
+  logging-filter = "akka.event.slf4j.Slf4jLoggingFilter"
+}
+
 sql-actor-dispatch {
     type = Dispatcher
      executor = "thread-pool-executor"
