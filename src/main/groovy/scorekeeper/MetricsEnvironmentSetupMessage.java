@@ -5,12 +5,12 @@ import java.util.Collection;
 
 import scorekeeper.metrics.DatasourceMetrics;
 import scorekeeper.metrics.JMXMetrics;
-import scorekeeper.metrics.Site24x7Metrics;
 
 public class MetricsEnvironmentSetupMessage {
 	private String envName;
 	private String hostName;
-	private int port;
+	private int statsDPort = 8125;
+	private int graphiteTCPPort = 2300;
 	private String appName;
 	private Collection<DatasourceMetrics> dsMetricPoints;
 	private Collection<JMXMetrics> jmxMetricPoints;
@@ -34,11 +34,11 @@ public class MetricsEnvironmentSetupMessage {
 	public void setHostName(String hostName) {
 		this.hostName = hostName;
 	}
-	public int getPort() {
-		return port;
+	public int getStatsDPort() {
+		return statsDPort;
 	}
-	public void setPort(int port) {
-		this.port = port;
+	public void setStatsDPort(int statsDPort) {
+		this.statsDPort = statsDPort;
 	}
 	public String getAppName() {
 		return appName;
@@ -67,13 +67,19 @@ public class MetricsEnvironmentSetupMessage {
 		return jmxMetricPoints;
 	}
 
-    public void addSite24x7Metrics(Metric ... newMetrics) {
-        for (Metric m: newMetrics) {
-            site24x7MetricPoints.add(m);
-        }
+    public void addSite24x7Metrics(Collection newMetrics) {
+        site24x7MetricPoints.addAll(newMetrics);
     }
 
     public Collection<Metric> getSite24x7Metrics() {
         return site24x7MetricPoints;
     }
+
+	public int getGraphiteTCPPort() {
+		return graphiteTCPPort;
+	}
+
+	public void setGraphiteTCPPort(int graphiteTCPPort) {
+		this.graphiteTCPPort = graphiteTCPPort;
+	}
 }

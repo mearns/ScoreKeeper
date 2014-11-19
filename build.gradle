@@ -1,13 +1,9 @@
 buildscript {
-    repositories {
-        jcenter()
-    }
-
+    repositories { jcenter() }
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:0.8"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:0.8'
     }
 }
-
 
 apply plugin: 'java'
 apply plugin: 'groovy'
@@ -29,6 +25,7 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.10.2'
     compile 'net.sourceforge.jtds:jtds:1.2.7'
     compile 'com.timgroup:java-statsd-client:3.0.2'
+    compile 'com.typesafe.akka:akka-slf4j_2.10:2.2.1'
 
     compile 'org.postgresql:postgresql:9.3-1102-jdbc41'
     compile 'ch.qos.logback:logback-classic:1.1.2'
@@ -38,6 +35,7 @@ dependencies {
 
 jar {
     manifest {
+        attributes "Class-Path": "lib/* config/*"
         attributes "Main-Class": "scorekeeper.ScoreKeeper"
         attributes "Built-Date": new Date() //now
         attributes "Built-By": System.getProperty("user.name")
@@ -47,9 +45,7 @@ jar {
         attributes "Implementation-Vendor-Id": project.group
         [
                 "BUILD_NUMBER": "Build-Number",
-                "BUILD_ID"    : "Build-Id",
-                "HG_COMMIT"   : "HG-Commit",
-                "HG_BRANCH"   : "HG-Branch"
+                "BUILD_ID"    : "Build-Id"
         ].each { envVar, attrName ->
             def envVal = System.getenv(envVar)
             if (envVal) {

@@ -1,18 +1,20 @@
 package scorekeeper.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 
 public class SampleConfigurationWriter {
+    private static Logger log = LoggerFactory.getLogger(SampleConfigurationWriter.class);
 
-    public static void writeSampleConfigAndDie() {
+    public static void writeSampleConfig(String whichSample, File location) {
         try {
-            InputStream source = SampleConfigurationWriter.class.getResourceAsStream("sample.system-props.conf");
-            copyFileUsingFileStreams(source, new File("config/sample.system-props.conf"));
+            InputStream source = SampleConfigurationWriter.class.getResourceAsStream(whichSample);
+            copyFileUsingFileStreams(source, location);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Can't copy " + whichSample + " to " + location.getAbsolutePath(), e);
         }
-
-        System.exit(1);
     }
 
     private static void copyFileUsingFileStreams(InputStream input, File dest) throws IOException {

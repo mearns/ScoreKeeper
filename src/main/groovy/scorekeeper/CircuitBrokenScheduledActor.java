@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.management.JMException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.UntypedActor;
@@ -16,7 +18,8 @@ public abstract class CircuitBrokenScheduledActor extends UntypedActor {
     private static final int TIME_BETWEEN_RETRIES_S = 30;
 	private CircuitBreaker breaker;
 	private FiniteDuration duration;
-	
+	private static Logger log = LoggerFactory.getLogger(CircuitBrokenScheduledActor.class);
+
 	protected CircuitBrokenScheduledActor(Metric metric){
 		this.duration = Duration.create(metric.getFrequencyMs(), TimeUnit.MILLISECONDS);
 		this.breaker = makeNewCB(duration.toMillis()*2);
@@ -39,7 +42,7 @@ public abstract class CircuitBrokenScheduledActor extends UntypedActor {
 
 	private class CloseHandler implements Runnable {
 		public void run(){
-			System.out.println("Circuit reset (closed) for " + getContext().self().path().name());
+			log.info("Circuit reset (closed) for " + getContext().self().path().name());
 		}
 	}
 
@@ -48,9 +51,9 @@ public abstract class CircuitBrokenScheduledActor extends UntypedActor {
 		public void run(){
             long currentDur = duration.toMillis();
             long newDur = Math.min(currentDur * 2, MAX_TIME_TO_WAIT_FOR_QUERY_REPEAT_S * 1000);
-			System.out.println("Circuit broken (open) for " + getContext().self().path().name() + "; delaying to " + currentDur);
+			log.warn("Circuit broken (open) for " + getContext().self().path().name() + "; delaying to " + currentDur);
 
-            duration = Duration.create(newDur, TimeUnit.MILLISECONDS);
+			duration = Duration.create(newDur, TimeUnit.MILLISECONDS);
             breaker = makeNewCB(newDur);
 		}
 	}
@@ -81,7 +84,7 @@ public abstract class CircuitBrokenScheduledActor extends UntypedActor {
 				throw ex;
 			} else if (ex instanceof CircuitBreakerOpenException){
 			} else {
-				ex.printStackTrace();
+				log.error("Exception while collection metrice", ex);
 			}
 		}
 	}
