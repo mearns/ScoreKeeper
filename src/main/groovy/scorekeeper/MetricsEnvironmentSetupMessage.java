@@ -15,6 +15,7 @@ public class MetricsEnvironmentSetupMessage {
 	private Collection<DatasourceMetrics> dsMetricPoints;
 	private Collection<JMXMetrics> jmxMetricPoints;
     private Collection<Metric> site24x7MetricPoints;
+	private int defaultPollingIntervalMS = 30 * 1000;
 	
 	public MetricsEnvironmentSetupMessage(){
 		dsMetricPoints = new ArrayList<>();
@@ -81,5 +82,13 @@ public class MetricsEnvironmentSetupMessage {
 
 	public void setGraphiteTCPPort(int graphiteTCPPort) {
 		this.graphiteTCPPort = graphiteTCPPort;
+	}
+
+	public int getDefaultPollingIntervalMS() {
+		return defaultPollingIntervalMS;
+	}
+
+	public void setDefaultPollingIntervalMS(int defaultPollingIntervalMS) {
+		this.defaultPollingIntervalMS = defaultPollingIntervalMS;
 	}
 }

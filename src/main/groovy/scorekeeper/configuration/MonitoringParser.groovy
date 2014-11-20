@@ -11,7 +11,7 @@ import scorekeeper.metrics.JMXMetrics
 public class MonitoringParser {
     public void initializeMetrics(MetricsEnvironmentSetupMessage sm, Collection<Config> collections) {
         for (Config collection : collections) {
-            String dsName = collection.hasPath("ds") ?: null
+            String dsName = collection.hasPath("ds") ? collection.getString("ds"): null
             for (Config cl : collection.getConfigList("monitors")) {
                 if (isDbMetric(cl)) {
                     addDbMetric(dsName, cl, sm)
@@ -37,18 +37,20 @@ public class MonitoringParser {
 
         Metric m = new Metric(getMetricName(cl))
         m.setSql(cl.getString("sql"))
-        setFrequency(cl, m)
+        setFrequency(cl, m, sm)
         if (cl.hasPath("group")) {
             m.setGrouped(cl.getBoolean("group"))
         }
         dsm.addMetrics(m)
     }
 
-    private static void setFrequency(Config cl, Metric m) {
+    private static void setFrequency(Config cl, Metric m, MetricsEnvironmentSetupMessage sm) {
         if (cl.hasPath("s")){
             m.setFrequencyMs(cl.getInt("s") * 1000)
-        } else {
+        } else if (cl.hasPath("ms")){
             m.setFrequencyMs(cl.getInt("ms"))//deprecated
+        } else {
+            m.setFrequencyMs(sm.getDefaultPollingIntervalMS())
         }
     }
 
@@ -71,7 +73,7 @@ public class MonitoringParser {
         Metric m = new Metric(getMetricName(cl))
         m.setObjectName(cl.getString("objectName"))
         m.setAttribute(cl.getString("attribute"))
-        setFrequency(cl, m)
+        setFrequency(cl, m, sm)
 
         jmxm.addMetrics(m)
     }
@@ -91,7 +93,7 @@ public class MonitoringParser {
 
     private static void addSite24x7Metric(Config cl, MetricsEnvironmentSetupMessage sm) {
         Metric m = new Metric(getMetricName(cl))
-        setFrequency(cl, m)
+        setFrequency(cl, m, sm)
         m.setUrl(cl.getString("url"))
 
         sm.addSite24x7Metrics(m)

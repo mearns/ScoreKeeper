@@ -32,7 +32,9 @@ public class SystemConfigParser {
         if (systemCfg.hasPath("stats-server.graphitePort")){
             sm.setGraphiteTCPPort(systemCfg.getInt("stats-server.graphitePort"));
         }
-
+        if (systemCfg.hasPath("stats-server.defaultIntervalInSeconds")){
+            sm.setDefaultPollingIntervalMS(systemCfg.getInt("stats-server.defaultIntervalInSeconds")*1000);
+        }
         initializeDatasources(systemCfg, sm);
         initializeJMX(systemCfg, sm);
 
