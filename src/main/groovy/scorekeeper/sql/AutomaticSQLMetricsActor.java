@@ -17,7 +17,7 @@ public class AutomaticSQLMetricsActor extends SQLMetricsActor {
 	}
 	
 	protected void doTheWholeMetricsThing() throws SQLException {
-		ResultSet rs = getStatement().executeQuery();
+		ResultSet rs = executeStatement();
 		rs.next();
 		
 		int i = 0;

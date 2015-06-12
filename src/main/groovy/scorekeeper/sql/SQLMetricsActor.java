@@ -1,23 +1,16 @@
 package scorekeeper.sql;
 
+import com.timgroup.statsd.StatsDClient;
+import scorekeeper.CircuitBrokenScheduledActor;
+import scorekeeper.DeadActorException;
+import scorekeeper.Metric;
+import scorekeeper.MetricsEnvironmentSetupMessage;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
-
-import javax.sql.DataSource;
-
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
-import scorekeeper.CircuitBrokenScheduledActor;
-import scorekeeper.DeadActorException;
-import scorekeeper.Metric;
-
-import com.timgroup.statsd.StatsDClient;
-
-import akka.actor.UntypedActor;
-import scorekeeper.MetricsEnvironmentSetupMessage;
 
 public abstract class SQLMetricsActor extends CircuitBrokenScheduledActor {
 	private DataSource sqlDataSource; 
@@ -37,11 +30,46 @@ public abstract class SQLMetricsActor extends CircuitBrokenScheduledActor {
 	}
 	
 	protected PreparedStatement getStatement() throws SQLException{
-		if (statement == null){
+
+		//If we already have a statement, we will try to reuse it. But if it's closed, throw it away and get a new one.
+		if(statement != null) {
+			try {
+				if (statement.isClosed()) {
+					statement = null;
+				}
+			} catch (SQLException e) {
+				try {
+					statement.close();
+				} catch (SQLException e2) {
+					//Nothing to be done
+				}
+				statement = null;
+			}
+		}
+
+		//Deliberately not an else if.
+		if (statement == null) {
 			statement = newPreparedStatement(metric.getSql());		
 			validateStatement(statement, metric.getActorName());			
 		}
 		return statement;
+	}
+
+	protected ResultSet executeStatement() throws SQLException {
+		PreparedStatement stmt = this.getStatement();
+		try {
+			return stmt.executeQuery();
+		} catch(SQLException e) {
+			//Exception could be network issue. In case it is, we want to throw away the
+			// connection, make sure we don't try again with the same one next time.
+			try {
+				stmt.close();
+			} catch(SQLException e2) {
+				// nop
+			}
+			this.statement = null;
+			throw e;
+		}
 	}
 
 	protected void validateStatement(PreparedStatement ps, String metricName) {

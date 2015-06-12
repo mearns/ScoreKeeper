@@ -17,7 +17,7 @@ public class AutomaticGroupedSQLMetricsActor extends SQLMetricsActor {
 	}
 
 	protected void doTheWholeMetricsThing() throws SQLException {
-		ResultSet rs = getStatement().executeQuery();
+		ResultSet rs = executeStatement();
 		while (rs.next()){
 			handleRow(rs);
 		}
