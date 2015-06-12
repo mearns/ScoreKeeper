@@ -3,6 +3,7 @@ package scorekeeper.site24x7;
 import com.timgroup.statsd.StatsDClient;
 import scorekeeper.CircuitBrokenScheduledActor;
 import scorekeeper.Metric;
+import scorekeeper.MetricsEnvironmentSetupMessage;
 
 import java.awt.*;
 import java.util.List;
@@ -12,8 +13,8 @@ public class Site24x7PollingActor extends CircuitBrokenScheduledActor {
     private final StatsDClient statsClient;
     private final Metric metric;
 
-    public Site24x7PollingActor(String url, StatsDClient sdc, Metric metric) {
-        super(metric);
+    public Site24x7PollingActor(MetricsEnvironmentSetupMessage setupMessage, String url, StatsDClient sdc, Metric metric) {
+        super(setupMessage, metric);
         this.site24x7Client = new Site24x7Client(url);
         this.statsClient = sdc;
         this.metric = metric;

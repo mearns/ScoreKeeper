@@ -30,6 +30,7 @@ import akka.pattern.CircuitBreaker;
 import akka.pattern.CircuitBreakerOpenException;
 
 import com.timgroup.statsd.StatsDClient;
+import scorekeeper.MetricsEnvironmentSetupMessage;
 
 public class JMXPollingActor extends CircuitBrokenScheduledActor {
 	private JMXServiceURL url; 
@@ -39,8 +40,8 @@ public class JMXPollingActor extends CircuitBrokenScheduledActor {
 	private MBeanServerConnection mbcon;
 	private ObjectName mbeanName;
 
-	public JMXPollingActor(JMXServiceURL url, StatsDClient sdc, Metric metric) {
-		super(metric);
+	public JMXPollingActor(MetricsEnvironmentSetupMessage setupMessage, JMXServiceURL url, StatsDClient sdc, Metric metric) {
+		super(setupMessage, metric);
 		try {
 			this.mbeanName = new ObjectName(metric.getObjectName());
 		} catch (MalformedObjectNameException e) {

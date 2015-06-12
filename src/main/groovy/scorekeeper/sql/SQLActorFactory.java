@@ -12,26 +12,29 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 
 import com.timgroup.statsd.StatsDClient;
+import scorekeeper.MetricsEnvironmentSetupMessage;
 
 public class SQLActorFactory {
 	private StatsDClient client;
 	private DataSource sqlDataSource;
 	private ActorContext actorContext;
+	private MetricsEnvironmentSetupMessage setupMessage;
 
-	public SQLActorFactory(StatsDClient client, DataSource dataSource, ActorContext actorCtx){
+	public SQLActorFactory(MetricsEnvironmentSetupMessage setupMessage, StatsDClient client, DataSource dataSource, ActorContext actorCtx){
+		this.setupMessage = setupMessage;
 		this.client = client;
 		this.sqlDataSource = dataSource;
 		this.actorContext = actorCtx;
 	}
 	
 	protected void makeScalarActor(Metric m) throws SQLException {
-		Props props = Props.create(AutomaticSQLMetricsActor.class, sqlDataSource, client, m)
+		Props props = Props.create(AutomaticSQLMetricsActor.class, setupMessage, sqlDataSource, client, m)
 				.withDispatcher("sql-actor-dispatch");
 		newActorFromProps(m.getActorName(), props);
 	}
 	
 	protected void makeGroupedActor(Metric m) throws SQLException {
-		Props props = Props.create(AutomaticGroupedSQLMetricsActor.class, sqlDataSource, client, m)
+		Props props = Props.create(AutomaticGroupedSQLMetricsActor.class, setupMessage, sqlDataSource, client, m)
 				.withDispatcher("sql-actor-dispatch");
 		newActorFromProps(m.getActorName(), props);
 	}

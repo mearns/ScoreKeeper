@@ -14,20 +14,20 @@ import akka.pattern.CircuitBreaker;
 import akka.pattern.CircuitBreakerOpenException;
 
 public abstract class CircuitBrokenScheduledActor extends UntypedActor {
-    private static final int MAX_TIME_TO_WAIT_FOR_QUERY_REPEAT_S = 120;
-    private static final int TIME_BETWEEN_RETRIES_S = 30;
 	private CircuitBreaker breaker;
 	private FiniteDuration duration;
+	private MetricsEnvironmentSetupMessage setupMessage;
 	private static Logger log = LoggerFactory.getLogger(CircuitBrokenScheduledActor.class);
 
-	protected CircuitBrokenScheduledActor(Metric metric){
+	protected CircuitBrokenScheduledActor(MetricsEnvironmentSetupMessage setupMessage, Metric metric){
 		this.duration = Duration.create(metric.getFrequencyMs(), TimeUnit.MILLISECONDS);
 		this.breaker = makeNewCB(duration.toMillis()*2);
+		this.setupMessage = setupMessage;
 	}
 
     private CircuitBreaker makeNewCB(long millis) {
         return new CircuitBreaker(getContext().dispatcher(), getContext().system().scheduler(),
-                1, Duration.create(millis, "ms"), Duration.create(TIME_BETWEEN_RETRIES_S, "s"))
+                1, Duration.create(millis, "ms"), Duration.create(setupMessage.getTimeBetweenRetriesS(), "s"))
             .onOpen(makeOpenHandler())
             .onClose(makeCloseHandler());
     }
@@ -50,7 +50,7 @@ public abstract class CircuitBrokenScheduledActor extends UntypedActor {
 	protected class OpenHandler implements Runnable {
 		public void run(){
             long currentDur = duration.toMillis();
-            long newDur = Math.min(currentDur * 2, MAX_TIME_TO_WAIT_FOR_QUERY_REPEAT_S * 1000);
+            long newDur = Math.min(currentDur * 2, setupMessage.getMaxQueryTimeoutS() * 1000);
 			log.warn("Circuit broken (open) for " + getContext().self().path().name() + "; delaying to " + currentDur);
 
 			duration = Duration.create(newDur, TimeUnit.MILLISECONDS);

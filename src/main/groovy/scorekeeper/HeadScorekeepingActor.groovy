@@ -60,17 +60,17 @@ public class HeadScorekeepingActor extends UntypedActor {
         StatsDClient hub = new NonBlockingStatsDClient(smsg.getAppName() + "." + smsg.getEnvName(), smsg.getHostName(), smsg.getStatsDPort());
 
         for (DatasourceMetrics dsm : smsg.getDatasourceMetrics()) {
-            new SQLActorFactory(hub, dsm.getDataSource(), getContext())
+            new SQLActorFactory(smsg, hub, dsm.getDataSource(), getContext())
                     .makeMetricsForDatasource(dsm.getMetrics());
         }
 
         for (JMXMetrics jmxms : smsg.getJMXMetrics()) {
-            new JMXActorFactory(hub, jmxms.connectToMBeanServer(), getContext())
+            new JMXActorFactory(smsg, hub, jmxms.connectToMBeanServer(), getContext())
                     .makeMetricsForDatasource(jmxms.getMetrics());
         }
 
         for (Metric site24x7Metrics : smsg.getSite24x7Metrics()) {
-            new Site24x7ActorFactory(hub, getContext())
+            new Site24x7ActorFactory(smsg, hub, getContext())
                     .makeMetricsForDatasource(site24x7Metrics);
         }
     }

@@ -23,6 +23,12 @@ public class SystemConfigParser {
         sm.setEnvName(systemCfg.getString("env"));
         sm.setHostName(systemCfg.getString("stats-server.host"));
 
+        if(systemCfg.hasPath("app.max-query-timeout")) {
+            sm.setMaxQueryTimeoutS(systemCfg.getInt("app.max-query-timeout"));
+        }
+        if(systemCfg.hasPath("app.time-between-retries")) {
+            sm.setTimeBetweenRetriesS(systemCfg.getInt("app.time-between-retries"));
+        }
         if (systemCfg.hasPath("stats-server.port")) {
             sm.setStatsDPort(systemCfg.getInt("stats-server.port"));
         }

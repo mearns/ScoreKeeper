@@ -17,6 +17,7 @@ import scorekeeper.Metric;
 import com.timgroup.statsd.StatsDClient;
 
 import akka.actor.UntypedActor;
+import scorekeeper.MetricsEnvironmentSetupMessage;
 
 public abstract class SQLMetricsActor extends CircuitBrokenScheduledActor {
 	private DataSource sqlDataSource; 
@@ -24,8 +25,8 @@ public abstract class SQLMetricsActor extends CircuitBrokenScheduledActor {
 	protected StatsDClient statsClient;
 	protected Metric metric;
 
-	SQLMetricsActor(DataSource sqlDataSource, StatsDClient statsD, Metric metric) throws SQLException{
-		super(metric);
+	SQLMetricsActor(MetricsEnvironmentSetupMessage setupMessage, DataSource sqlDataSource, StatsDClient statsD, Metric metric) throws SQLException{
+		super(setupMessage, metric);
 		this.sqlDataSource = sqlDataSource;
 		this.statsClient = statsD;
 		this.metric = metric;

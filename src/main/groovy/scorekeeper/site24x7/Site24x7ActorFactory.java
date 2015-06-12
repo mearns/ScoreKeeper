@@ -5,6 +5,7 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import com.timgroup.statsd.StatsDClient;
 import scorekeeper.Metric;
+import scorekeeper.MetricsEnvironmentSetupMessage;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -13,8 +14,10 @@ public class Site24x7ActorFactory {
 
     private final StatsDClient client;
     private final ActorContext context;
+    private final MetricsEnvironmentSetupMessage setupMessage;
 
-    public Site24x7ActorFactory(StatsDClient client, ActorContext context) {
+    public Site24x7ActorFactory(MetricsEnvironmentSetupMessage setupMessage, StatsDClient client, ActorContext context) {
+        this.setupMessage = setupMessage;
         this.client = client;
         this.context = context;
     }
@@ -24,7 +27,7 @@ public class Site24x7ActorFactory {
     }
 
     private void makeScalarActor(Metric m) throws SQLException {
-        Props props = Props.create(Site24x7PollingActor.class, m.getUrl(), client, m);
+        Props props = Props.create(Site24x7PollingActor.class, setupMessage, m.getUrl(), client, m);
         newActorFromProps(m.getActorName(), props);
     }
 
